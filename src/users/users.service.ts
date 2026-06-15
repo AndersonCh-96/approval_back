@@ -101,6 +101,7 @@ export class UsersService {
       throw new NotFoundException('User not found');
     }
 
+    console.log('Updating user with data:', data);
     if (data.name !== undefined) user.name = data.name;
     if (data.email !== undefined) user.email = data.email;
     if (data.password !== undefined) {

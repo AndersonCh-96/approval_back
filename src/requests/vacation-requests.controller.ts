@@ -4,22 +4,19 @@ import {
   Post,
   Body,
   Param,
-  Query,
   UseGuards,
 } from '@nestjs/common';
 import { RequestsService } from './requests.service';
 import { CreateVacationRequestDto } from './dto/create-vacation-request.dto';
 import { ApproveRequestDto } from './dto/approve-request.dto';
-import { VacationFilterDto } from './dto/vacation-filter.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RoleName } from '../enums/role-name.enum';
-import { RequestType } from '../enums/request-type.enum';
 
 @Controller('vacation-requests')
-@UseGuards(JwtAuthGuard, RolesGuard)
+// @UseGuards(JwtAuthGuard, RolesGuard)
 export class VacationRequestsController {
   constructor(private readonly requestsService: RequestsService) { }
 
@@ -32,34 +29,22 @@ export class VacationRequestsController {
   }
 
   @Get()
-  @Roles(RoleName.ADMIN, RoleName.RRHH)
-  findAll(@Query() filters: VacationFilterDto) {
-    return this.requestsService.findAllVacations(filters);
+  // @Roles(RoleName.ADMIN, RoleName.RRHH)
+  findAll() {
+    return this.requestsService.findAll();
   }
 
   @Get('pending')
-  @Roles(RoleName.GERENTE, RoleName.RRHH, RoleName.ADMIN)
-  findPendingForApprover(
-    @Query() filters: VacationFilterDto,
-    @CurrentUser() user: any,
-  ) {
+  @Roles(RoleName.GERENTE, RoleName.RRHH, RoleName.ADMIN, RoleName.LIDER)
+  findPendingForApprover(@CurrentUser() user: any) {
     return this.requestsService.findPendingForApprover(
       user.id,
-      RequestType.VACATION,
-      { page: filters.page ?? 1, limit: filters.limit ?? 10 },
     );
   }
 
   @Get('my-requests')
-  findMyRequests(
-    @Query() filters: VacationFilterDto,
-    @CurrentUser() user: any,
-  ) {
-    return this.requestsService.findByUser(
-      user.id,
-      RequestType.VACATION,
-      { page: filters.page ?? 1, limit: filters.limit ?? 10 },
-    );
+  findMyRequests(@CurrentUser() user: any) {
+    return this.requestsService.findByUser(user.id);
   }
 
   @Get(':id')
@@ -73,7 +58,7 @@ export class VacationRequestsController {
   }
 
   @Post(':id/approve')
-  @Roles(RoleName.GERENTE, RoleName.RRHH, RoleName.ADMIN)
+  // @Roles(RoleName.GERENTE, RoleName.RRHH, RoleName.ADMIN)
   approve(
     @Param('id') id: string,
     @Body() dto: ApproveRequestDto,
