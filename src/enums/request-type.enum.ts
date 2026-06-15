@@ -1,0 +1,5 @@
+export enum RequestType {
+  VACATION = 'VACATION',
+  MONEY_ADVANCE = 'MONEY_ADVANCE',
+  PERMISSION = 'PERMISSION',
+}
